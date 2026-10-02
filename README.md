@@ -37,3 +37,15 @@ flushing loses its last words when stdout is block-buffered (a pipe).
 Modern footnote: under a supervisor like systemd the whole ritual is mostly
 obsolete; the supervisor does the detaching. The mechanism remains the
 clearest demonstration of what sessions and controlling terminals are.
+
+## The first fork is load-bearing
+
+`setsid` fails with `EPERM` when the caller is already a process group
+leader, so the child must exist before it can leave the old session.
+Verified live:
+
+```
+$ gcc -O2 -Wall -Werror setsid_eperm.c -o setsid_eperm && ./setsid_eperm
+now a process group leader: pid=13903 pgid=13903
+setsid failed as promised: errno=1 (EPERM)
+```
